@@ -4,7 +4,7 @@ import Logo from './Logo';
 import Version from './Version';
 import './App.css';
 
-const socket = io('https://walkie-talkie-backend.onrender.com'); // Connect to the backend
+const socket = io('http://localhost:5000'); // Ensure this matches your backend URL
 
 function App() {
   const [message, setMessage] = useState('');
@@ -14,6 +14,11 @@ function App() {
 
   // Handle name selection
   const handleNameSelection = (selectedName) => {
+    console.log('Selected Name:', selectedName); // Debugging
+    if (!selectedName) {
+      console.error('No username selected');
+      return;
+    }
     setUsername(selectedName);
     socket.emit('identify-user', selectedName); // Send username to the server
     setShowChat(true); // Show the chat interface
@@ -24,11 +29,11 @@ function App() {
     if (message.trim()) {
       const messageData = {
         text: message,
-        sender: username, // Use selected username
+        sender: username,
         timestamp: new Date().toLocaleTimeString(),
       };
+      console.log('Sending Message:', messageData); // Debugging
       socket.emit('send-message', messageData);
-      // Add the message to the local state for the sender
       setMessages((prevMessages) => [...prevMessages, messageData]);
       setMessage('');
     }
@@ -37,8 +42,14 @@ function App() {
   // Listen for incoming messages
   useEffect(() => {
     socket.on('receive-message', (data) => {
+      console.log('Received Message:', data); // Debugging
       setMessages((prevMessages) => [...prevMessages, data]);
     });
+
+    // Cleanup on unmount
+    return () => {
+      socket.off('receive-message');
+    };
   }, []);
 
   return (
@@ -75,4 +86,4 @@ function App() {
   );
 }
 
-export default App;
+export default App; // Ensure this is a default export
