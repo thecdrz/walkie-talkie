@@ -4,7 +4,7 @@ import Logo from './Logo';
 import Version from './Version';
 import './App.css';
 
-const socket = io('http://localhost:5000'); // Ensure this matches your backend URL
+const socket = io('https://walkie-talkie-backend.onrender.com'); // Use the Render backend URL
 
 function App() {
   const [message, setMessage] = useState('');
